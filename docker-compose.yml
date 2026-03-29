@@ -1,0 +1,91 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=mealmate;Username=mealmate;Password=mealmate_password
+      - ConnectionStrings__Redis=redis:6379
+      - Jwt__Secret=your-super-secret-jwt-key-change-in-production-min-32-chars
+      - Jwt__Issuer=MealMate
+      - Jwt__Audience=MealMate
+      - Email__SmtpHost=${SMTP_HOST:-}
+      - Email__SmtpPort=${SMTP_PORT:-587}
+      - Email__SmtpUser=${SMTP_USER:-}
+      - Email__SmtpPass=${SMTP_PASS:-}
+      - Email__FromEmail=${FROM_EMAIL:-noreply@mealmate.app}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - mealmate-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080/api
+      - NODE_ENV=production
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - mealmate-network
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=mealmate
+      - POSTGRES_USER=mealmate
+      - POSTGRES_PASSWORD=mealmate_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mealmate -d mealmate"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mealmate-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mealmate-network
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  mealmate-network:
+    driver: bridge

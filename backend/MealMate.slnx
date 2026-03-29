@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MealMate.API/MealMate.API.csproj" />
+    <Project Path="src/MealMate.Application/MealMate.Application.csproj" />
+    <Project Path="src/MealMate.Domain/MealMate.Domain.csproj" />
+    <Project Path="src/MealMate.Infrastructure/MealMate.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MealMate.Tests/MealMate.Tests.csproj" />
+  </Folder>
+</Solution>
