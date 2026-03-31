@@ -18,6 +18,8 @@ public static class DependencyInjection
         services.AddScoped<IHouseholdService, HouseholdService>();
         services.AddScoped<IIngredientService, IngredientService>();
         services.AddScoped<IRecipeService, RecipeService>();
+        services.AddScoped<IFridgeService, FridgeService>();
+        services.AddScoped<IShoppingService, ShoppingService>();
 
         return services;
     }

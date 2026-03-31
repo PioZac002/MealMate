@@ -37,6 +37,8 @@ export default function DashboardPage() {
           <div className="flex items-center gap-6">
             <Link href="/recipes" className="text-gray-600 hover:text-green-700">Recipes</Link>
             <Link href="/households" className="text-gray-600 hover:text-green-700">Household</Link>
+            <Link href="/fridge" className="text-gray-600 hover:text-green-700">Fridge</Link>
+            <Link href="/shopping" className="text-gray-600 hover:text-green-700">Shopping</Link>
             <button
               onClick={handleLogout}
               className="text-gray-500 hover:text-red-600 text-sm"
@@ -68,17 +70,17 @@ export default function DashboardPage() {
             <p className="text-gray-500 text-sm mt-1">Manage your household and members</p>
           </Link>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 opacity-60">
+          <Link href="/fridge" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow block">
             <div className="text-3xl mb-3">🧊</div>
             <h3 className="text-lg font-semibold text-gray-800">Smart Fridge</h3>
-            <p className="text-gray-500 text-sm mt-1">Coming in Phase 2</p>
-          </div>
+            <p className="text-gray-500 text-sm mt-1">Track ingredients and expiry dates</p>
+          </Link>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 opacity-60">
+          <Link href="/shopping" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow block">
             <div className="text-3xl mb-3">🛒</div>
             <h3 className="text-lg font-semibold text-gray-800">Shopping Lists</h3>
-            <p className="text-gray-500 text-sm mt-1">Coming in Phase 2</p>
-          </div>
+            <p className="text-gray-500 text-sm mt-1">Manage household shopping</p>
+          </Link>
 
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 opacity-60">
             <div className="text-3xl mb-3">🔥</div>

@@ -41,6 +41,8 @@ export const api = {
     request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
   put: <T>(path: string, body: unknown) =>
     request<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
+  patch: <T>(path: string, body: unknown) =>
+    request<T>(path, { method: 'PATCH', body: JSON.stringify(body) }),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
 };
 
@@ -200,4 +202,81 @@ export const householdsApi = {
   join: (code: string) => api.post<Household>('/households/join', { code }),
   removeMember: (householdId: string, memberId: string) =>
     api.delete(`/households/${householdId}/members/${memberId}`),
+};
+
+// Fridge
+export interface FridgeItem {
+  id: string;
+  householdId: string;
+  ingredientId: string;
+  ingredientName: string;
+  ingredientCategory: string;
+  ingredientImageUrl?: string;
+  quantity: number;
+  unit: string;
+  expiryDate?: string;
+  addedAt: string;
+  source: string;
+  addedByUserName: string;
+  isExpiringSoon: boolean;
+  isExpired: boolean;
+}
+
+export const fridgeApi = {
+  getAll: (householdId: string) =>
+    api.get<FridgeItem[]>(`/households/${householdId}/fridge`),
+  add: (householdId: string, data: { ingredientId: string; quantity: number; unit: string; expiryDate?: string }) =>
+    api.post<FridgeItem>(`/households/${householdId}/fridge`, data),
+  update: (householdId: string, itemId: string, data: { quantity: number; unit: string; expiryDate?: string }) =>
+    api.put<FridgeItem>(`/households/${householdId}/fridge/${itemId}`, data),
+  delete: (householdId: string, itemId: string) =>
+    api.delete(`/households/${householdId}/fridge/${itemId}`),
+};
+
+// Shopping Lists
+export interface ShoppingList {
+  id: string;
+  householdId: string;
+  name: string;
+  createdAt: string;
+  isCompleted: boolean;
+  completedAt?: string;
+  itemCount: number;
+  boughtCount: number;
+}
+
+export interface ShoppingListDetail extends Omit<ShoppingList, 'itemCount' | 'boughtCount'> {
+  items: ShoppingListItem[];
+}
+
+export interface ShoppingListItem {
+  id: string;
+  shoppingListId: string;
+  ingredientId: string;
+  ingredientName: string;
+  ingredientImageUrl?: string;
+  quantity: number;
+  unit: string;
+  isBought: boolean;
+  boughtAt?: string;
+  source: string;
+}
+
+export const shoppingApi = {
+  getAll: (householdId: string) =>
+    api.get<ShoppingList[]>(`/households/${householdId}/shopping-lists`),
+  getById: (householdId: string, listId: string) =>
+    api.get<ShoppingListDetail>(`/households/${householdId}/shopping-lists/${listId}`),
+  create: (householdId: string, data: { name: string }) =>
+    api.post<ShoppingListDetail>(`/households/${householdId}/shopping-lists`, data),
+  addItem: (householdId: string, listId: string, data: { ingredientId: string; quantity: number; unit: string }) =>
+    api.post<ShoppingListItem>(`/households/${householdId}/shopping-lists/${listId}/items`, data),
+  toggleItem: (householdId: string, listId: string, itemId: string) =>
+    api.patch<ShoppingListItem>(`/households/${householdId}/shopping-lists/${listId}/items/${itemId}/toggle`, {}),
+  removeItem: (householdId: string, listId: string, itemId: string) =>
+    api.delete(`/households/${householdId}/shopping-lists/${listId}/items/${itemId}`),
+  complete: (householdId: string, listId: string) =>
+    api.post<ShoppingListDetail>(`/households/${householdId}/shopping-lists/${listId}/complete`, {}),
+  delete: (householdId: string, listId: string) =>
+    api.delete(`/households/${householdId}/shopping-lists/${listId}`),
 };

@@ -29,7 +29,12 @@ export default function RecipesPage() {
             <span className="text-2xl">🍽️</span>
             <span className="text-xl font-bold text-green-700">MealMate</span>
           </Link>
-          <Link href="/dashboard" className="text-gray-600 hover:text-green-700">Dashboard</Link>
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard" className="text-gray-600 hover:text-green-700 text-sm">Dashboard</Link>
+            <Link href="/households" className="text-gray-600 hover:text-green-700 text-sm">Household</Link>
+            <Link href="/fridge" className="text-gray-600 hover:text-green-700 text-sm">Fridge</Link>
+            <Link href="/shopping" className="text-gray-600 hover:text-green-700 text-sm">Shopping</Link>
+          </div>
         </div>
       </nav>
 

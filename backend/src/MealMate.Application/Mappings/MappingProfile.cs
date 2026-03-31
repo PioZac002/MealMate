@@ -1,9 +1,12 @@
 using AutoMapper;
 using MealMate.Application.DTOs.Auth;
+using MealMate.Application.DTOs.Fridge;
 using MealMate.Application.DTOs.Household;
 using MealMate.Application.DTOs.Ingredient;
 using MealMate.Application.DTOs.Recipe;
+using MealMate.Application.DTOs.Shopping;
 using MealMate.Domain.Entities;
+using MealMate.Domain.Enums;
 
 namespace MealMate.Application.Mappings;
 
@@ -70,5 +73,34 @@ public class MappingProfile : Profile
 
         CreateMap<CreateRecipeIngredientDto, RecipeIngredient>();
         CreateMap<CreateRecipeStepDto, RecipeStep>();
+
+        // Fridge
+        CreateMap<FridgeItem, FridgeItemDto>()
+            .ForMember(d => d.IngredientName, o => o.MapFrom(s =>
+                s.Ingredient != null ? s.Ingredient.Name : string.Empty))
+            .ForMember(d => d.IngredientCategory, o => o.MapFrom(s =>
+                s.Ingredient != null ? s.Ingredient.Category.ToString() : string.Empty))
+            .ForMember(d => d.IngredientImageUrl, o => o.MapFrom(s =>
+                s.Ingredient != null ? s.Ingredient.ImageUrl : null))
+            .ForMember(d => d.Source, o => o.MapFrom(s => s.Source.ToString()))
+            .ForMember(d => d.AddedByUserName, o => o.MapFrom(s =>
+                s.AddedByUser != null ? $"{s.AddedByUser.FirstName} {s.AddedByUser.LastName}" : string.Empty))
+            .ForMember(d => d.IsExpiringSoon, o => o.Ignore())
+            .ForMember(d => d.IsExpired, o => o.Ignore());
+
+        // Shopping
+        CreateMap<ShoppingList, ShoppingListDto>()
+            .ForMember(d => d.ItemCount, o => o.MapFrom(s => s.Items.Count))
+            .ForMember(d => d.BoughtCount, o => o.MapFrom(s => s.Items.Count(i => i.IsBought)));
+
+        CreateMap<ShoppingList, ShoppingListDetailDto>()
+            .ForMember(d => d.Items, o => o.MapFrom(s => s.Items));
+
+        CreateMap<ShoppingListItem, ShoppingListItemDto>()
+            .ForMember(d => d.IngredientName, o => o.MapFrom(s =>
+                s.Ingredient != null ? s.Ingredient.Name : string.Empty))
+            .ForMember(d => d.IngredientImageUrl, o => o.MapFrom(s =>
+                s.Ingredient != null ? s.Ingredient.ImageUrl : null))
+            .ForMember(d => d.Source, o => o.MapFrom(s => s.Source.ToString()));
     }
 }

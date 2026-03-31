@@ -24,6 +24,8 @@ public static class DependencyInjection
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<AppDbContext>());
         services.AddScoped<IIngredientDbContext>(sp => sp.GetRequiredService<AppDbContext>());
         services.AddScoped<IRecipeDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+        services.AddScoped<IFridgeDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+        services.AddScoped<IShoppingDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
         // Identity
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>

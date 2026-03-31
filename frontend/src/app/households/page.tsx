@@ -83,12 +83,12 @@ export default function HouseholdsPage() {
             <span className="text-2xl">🍽️</span>
             <span className="text-xl font-bold text-green-700">MealMate</span>
           </Link>
-          <Link href="/dashboard" className="text-gray-600 hover:text-green-700">Dashboard</Link>
-        </div>
-      </nav>
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">My Households</h1>
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard" className="text-gray-600 hover:text-green-700 text-sm">Dashboard</Link>
+            <Link href="/recipes" className="text-gray-600 hover:text-green-700 text-sm">Recipes</Link>
+            <Link href="/fridge" className="text-gray-600 hover:text-green-700 text-sm">Fridge</Link>
+            <Link href="/shopping" className="text-gray-600 hover:text-green-700 text-sm">Shopping</Link>
+          </div>
 
         {message && (
           <div className={`px-4 py-3 rounded-lg mb-6 text-sm ${
