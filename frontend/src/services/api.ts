@@ -280,3 +280,140 @@ export const shoppingApi = {
   delete: (householdId: string, listId: string) =>
     api.delete(`/households/${householdId}/shopping-lists/${listId}`),
 };
+
+// Nutrition
+export interface DailyNutritionLog {
+  id: string;
+  date: string;
+  calorieGoal: number;
+  proteinGoal: number;
+  carbsGoal: number;
+  fatGoal: number;
+  notes?: string;
+  mealLogs: MealLog[];
+  totalCalories: number;
+  totalProtein: number;
+  totalCarbs: number;
+  totalFat: number;
+}
+
+export interface MealLog {
+  id: string;
+  mealType: string;
+  recipeId?: string;
+  recipeName?: string;
+  customFoodName?: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  servings: number;
+  loggedAt: string;
+  foodName: string;
+}
+
+export const nutritionApi = {
+  getToday: () => api.get<DailyNutritionLog>('/nutrition/today'),
+  getByDate: (date: string) => api.get<DailyNutritionLog>(`/nutrition/${date}`),
+  setGoals: (date: string, data: { calorieGoal: number; proteinGoal: number; carbsGoal: number; fatGoal: number; notes?: string }) =>
+    api.put<DailyNutritionLog>(`/nutrition/${date}/goals`, data),
+  addMeal: (date: string, data: { mealType: string; recipeId?: string; customFoodName?: string; calories: number; protein: number; carbs: number; fat: number; servings: number }) =>
+    api.post<MealLog>(`/nutrition/${date}/meals`, data),
+  removeMeal: (mealLogId: string) => api.delete(`/nutrition/meals/${mealLogId}`),
+  getHistory: (days?: number) => api.get<DailyNutritionLog[]>(`/nutrition/history${days ? `?days=${days}` : ''}`),
+};
+
+// Fitness
+export interface Exercise {
+  id: string;
+  name: string;
+  muscleGroup: string;
+  description?: string;
+  caloriesPerMinute: number;
+  imageUrl?: string;
+}
+
+export interface WorkoutPlan {
+  id: string;
+  name: string;
+  description?: string;
+  exerciseCount: number;
+}
+
+export interface WorkoutPlanDetail {
+  id: string;
+  name: string;
+  description?: string;
+  exercises: WorkoutPlanExercise[];
+}
+
+export interface WorkoutPlanExercise {
+  id: string;
+  exerciseId: string;
+  exerciseName: string;
+  muscleGroup: string;
+  sets: number;
+  reps: number;
+  restSeconds: number;
+  orderIndex: number;
+}
+
+export interface Workout {
+  id: string;
+  date: string;
+  workoutPlanId?: string;
+  workoutPlanName?: string;
+  durationMinutes: number;
+  caloriesBurned: number;
+  notes?: string;
+  setCount: number;
+}
+
+export interface WorkoutDetail {
+  id: string;
+  date: string;
+  workoutPlanId?: string;
+  workoutPlanName?: string;
+  durationMinutes: number;
+  caloriesBurned: number;
+  notes?: string;
+  sets: WorkoutSet[];
+}
+
+export interface WorkoutSet {
+  id: string;
+  exerciseId: string;
+  exerciseName: string;
+  muscleGroup: string;
+  setNumber: number;
+  reps: number;
+  weight: number;
+  isPersonalRecord: boolean;
+}
+
+export const exercisesApi = {
+  getAll: (params?: { search?: string; muscleGroup?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.search) query.set('search', params.search);
+    if (params?.muscleGroup) query.set('muscleGroup', params.muscleGroup);
+    return api.get<Exercise[]>(`/exercises?${query}`);
+  },
+  create: (data: { name: string; muscleGroup: string; description?: string; caloriesPerMinute: number }) =>
+    api.post<Exercise>('/exercises', data),
+};
+
+export const workoutPlansApi = {
+  getAll: () => api.get<WorkoutPlan[]>('/workout-plans'),
+  getById: (planId: string) => api.get<WorkoutPlanDetail>(`/workout-plans/${planId}`),
+  create: (data: { name: string; description?: string; exercises: { exerciseId: string; sets: number; reps: number; restSeconds: number; orderIndex: number }[] }) =>
+    api.post<WorkoutPlanDetail>('/workout-plans', data),
+  delete: (planId: string) => api.delete(`/workout-plans/${planId}`),
+};
+
+export const workoutsApi = {
+  getAll: (days?: number) => api.get<Workout[]>(`/workouts${days ? `?days=${days}` : ''}`),
+  getById: (workoutId: string) => api.get<WorkoutDetail>(`/workouts/${workoutId}`),
+  log: (data: { date: string; workoutPlanId?: string; durationMinutes: number; caloriesBurned: number; notes?: string; sets: { exerciseId: string; setNumber: number; reps: number; weight: number }[] }) =>
+    api.post<WorkoutDetail>('/workouts', data),
+  delete: (workoutId: string) => api.delete(`/workouts/${workoutId}`),
+};

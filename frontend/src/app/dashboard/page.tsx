@@ -39,6 +39,8 @@ export default function DashboardPage() {
             <Link href="/households" className="text-gray-600 hover:text-green-700">Household</Link>
             <Link href="/fridge" className="text-gray-600 hover:text-green-700">Fridge</Link>
             <Link href="/shopping" className="text-gray-600 hover:text-green-700">Shopping</Link>
+            <Link href="/nutrition" className="text-gray-600 hover:text-green-700">Nutrition</Link>
+            <Link href="/fitness" className="text-gray-600 hover:text-green-700">Fitness</Link>
             <button
               onClick={handleLogout}
               className="text-gray-500 hover:text-red-600 text-sm"
@@ -82,17 +84,17 @@ export default function DashboardPage() {
             <p className="text-gray-500 text-sm mt-1">Manage household shopping</p>
           </Link>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 opacity-60">
+          <Link href="/nutrition" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow block">
             <div className="text-3xl mb-3">🔥</div>
             <h3 className="text-lg font-semibold text-gray-800">Calorie Tracker</h3>
-            <p className="text-gray-500 text-sm mt-1">Coming in Phase 3</p>
-          </div>
+            <p className="text-gray-500 text-sm mt-1">Log meals and track macros</p>
+          </Link>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 opacity-60">
+          <Link href="/fitness" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow block">
             <div className="text-3xl mb-3">🏋️</div>
             <h3 className="text-lg font-semibold text-gray-800">Fitness Tracker</h3>
-            <p className="text-gray-500 text-sm mt-1">Coming in Phase 3</p>
-          </div>
+            <p className="text-gray-500 text-sm mt-1">Log workouts and track progress</p>
+          </Link>
         </div>
 
         <div className="mt-6 bg-green-50 rounded-2xl p-6 border border-green-100">

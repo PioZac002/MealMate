@@ -21,6 +21,7 @@ public static class DataSeeder
             await context.Database.MigrateAsync();
             await SeedRolesAsync(roleManager);
             await SeedIngredientsAsync(context);
+            await SeedExercisesAsync(context);
             logger.LogInformation("Database seeded successfully.");
         }
         catch (Exception ex)
@@ -87,6 +88,64 @@ public static class DataSeeder
         };
 
         context.Ingredients.AddRange(ingredients);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedExercisesAsync(AppDbContext context)
+    {
+        if (await context.Exercises.AnyAsync()) return;
+
+        var exercises = new List<Exercise>
+        {
+            // Chest
+            new() { Id = Guid.NewGuid(), Name = "Bench Press", MuscleGroup = MuscleGroup.Chest, CaloriesPerMinute = 8, Description = "Barbell or dumbbell press on a flat bench" },
+            new() { Id = Guid.NewGuid(), Name = "Push-Up", MuscleGroup = MuscleGroup.Chest, CaloriesPerMinute = 7, Description = "Classic bodyweight push-up" },
+            new() { Id = Guid.NewGuid(), Name = "Incline Bench Press", MuscleGroup = MuscleGroup.Chest, CaloriesPerMinute = 8, Description = "Bench press on an incline bench" },
+            new() { Id = Guid.NewGuid(), Name = "Chest Fly", MuscleGroup = MuscleGroup.Chest, CaloriesPerMinute = 6, Description = "Cable or dumbbell chest fly" },
+
+            // Back
+            new() { Id = Guid.NewGuid(), Name = "Pull-Up", MuscleGroup = MuscleGroup.Back, CaloriesPerMinute = 9, Description = "Bodyweight pull-up or chin-up" },
+            new() { Id = Guid.NewGuid(), Name = "Barbell Row", MuscleGroup = MuscleGroup.Back, CaloriesPerMinute = 8, Description = "Bent-over barbell row" },
+            new() { Id = Guid.NewGuid(), Name = "Lat Pulldown", MuscleGroup = MuscleGroup.Back, CaloriesPerMinute = 7, Description = "Cable lat pulldown" },
+            new() { Id = Guid.NewGuid(), Name = "Deadlift", MuscleGroup = MuscleGroup.Back, CaloriesPerMinute = 10, Description = "Conventional or Romanian deadlift" },
+
+            // Shoulders
+            new() { Id = Guid.NewGuid(), Name = "Overhead Press", MuscleGroup = MuscleGroup.Shoulders, CaloriesPerMinute = 8, Description = "Barbell or dumbbell overhead press" },
+            new() { Id = Guid.NewGuid(), Name = "Lateral Raise", MuscleGroup = MuscleGroup.Shoulders, CaloriesPerMinute = 5, Description = "Dumbbell lateral raise" },
+            new() { Id = Guid.NewGuid(), Name = "Front Raise", MuscleGroup = MuscleGroup.Shoulders, CaloriesPerMinute = 5, Description = "Dumbbell front raise" },
+
+            // Arms
+            new() { Id = Guid.NewGuid(), Name = "Bicep Curl", MuscleGroup = MuscleGroup.Arms, CaloriesPerMinute = 5, Description = "Dumbbell or barbell bicep curl" },
+            new() { Id = Guid.NewGuid(), Name = "Tricep Dip", MuscleGroup = MuscleGroup.Arms, CaloriesPerMinute = 7, Description = "Bodyweight or weighted tricep dip" },
+            new() { Id = Guid.NewGuid(), Name = "Hammer Curl", MuscleGroup = MuscleGroup.Arms, CaloriesPerMinute = 5, Description = "Neutral-grip dumbbell curl" },
+            new() { Id = Guid.NewGuid(), Name = "Skull Crusher", MuscleGroup = MuscleGroup.Arms, CaloriesPerMinute = 6, Description = "Lying tricep extension" },
+
+            // Legs
+            new() { Id = Guid.NewGuid(), Name = "Squat", MuscleGroup = MuscleGroup.Legs, CaloriesPerMinute = 10, Description = "Barbell back squat" },
+            new() { Id = Guid.NewGuid(), Name = "Leg Press", MuscleGroup = MuscleGroup.Legs, CaloriesPerMinute = 8, Description = "Machine leg press" },
+            new() { Id = Guid.NewGuid(), Name = "Lunge", MuscleGroup = MuscleGroup.Legs, CaloriesPerMinute = 8, Description = "Walking or stationary lunges" },
+            new() { Id = Guid.NewGuid(), Name = "Leg Curl", MuscleGroup = MuscleGroup.Legs, CaloriesPerMinute = 6, Description = "Machine hamstring curl" },
+            new() { Id = Guid.NewGuid(), Name = "Calf Raise", MuscleGroup = MuscleGroup.Legs, CaloriesPerMinute = 5, Description = "Standing or seated calf raise" },
+
+            // Core
+            new() { Id = Guid.NewGuid(), Name = "Plank", MuscleGroup = MuscleGroup.Core, CaloriesPerMinute = 5, Description = "Isometric core hold" },
+            new() { Id = Guid.NewGuid(), Name = "Crunch", MuscleGroup = MuscleGroup.Core, CaloriesPerMinute = 5, Description = "Standard abdominal crunch" },
+            new() { Id = Guid.NewGuid(), Name = "Russian Twist", MuscleGroup = MuscleGroup.Core, CaloriesPerMinute = 6, Description = "Rotational core exercise" },
+            new() { Id = Guid.NewGuid(), Name = "Leg Raise", MuscleGroup = MuscleGroup.Core, CaloriesPerMinute = 5, Description = "Lying or hanging leg raise" },
+
+            // Cardio
+            new() { Id = Guid.NewGuid(), Name = "Running", MuscleGroup = MuscleGroup.Cardio, CaloriesPerMinute = 12, Description = "Outdoor or treadmill running" },
+            new() { Id = Guid.NewGuid(), Name = "Cycling", MuscleGroup = MuscleGroup.Cardio, CaloriesPerMinute = 10, Description = "Stationary or outdoor cycling" },
+            new() { Id = Guid.NewGuid(), Name = "Jump Rope", MuscleGroup = MuscleGroup.Cardio, CaloriesPerMinute = 13, Description = "Skipping rope cardio" },
+            new() { Id = Guid.NewGuid(), Name = "Rowing", MuscleGroup = MuscleGroup.Cardio, CaloriesPerMinute = 11, Description = "Rowing machine cardio" },
+
+            // Full Body
+            new() { Id = Guid.NewGuid(), Name = "Burpee", MuscleGroup = MuscleGroup.FullBody, CaloriesPerMinute = 14, Description = "Full-body explosive movement" },
+            new() { Id = Guid.NewGuid(), Name = "Kettlebell Swing", MuscleGroup = MuscleGroup.FullBody, CaloriesPerMinute = 12, Description = "Hip-hinge kettlebell movement" },
+            new() { Id = Guid.NewGuid(), Name = "Clean and Press", MuscleGroup = MuscleGroup.FullBody, CaloriesPerMinute = 11, Description = "Olympic-style lift" },
+        };
+
+        context.Exercises.AddRange(exercises);
         await context.SaveChangesAsync();
     }
 }

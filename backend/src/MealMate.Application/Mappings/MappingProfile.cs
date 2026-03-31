@@ -1,8 +1,10 @@
 using AutoMapper;
 using MealMate.Application.DTOs.Auth;
+using MealMate.Application.DTOs.Fitness;
 using MealMate.Application.DTOs.Fridge;
 using MealMate.Application.DTOs.Household;
 using MealMate.Application.DTOs.Ingredient;
+using MealMate.Application.DTOs.Nutrition;
 using MealMate.Application.DTOs.Recipe;
 using MealMate.Application.DTOs.Shopping;
 using MealMate.Domain.Entities;
@@ -102,5 +104,50 @@ public class MappingProfile : Profile
             .ForMember(d => d.IngredientImageUrl, o => o.MapFrom(s =>
                 s.Ingredient != null ? s.Ingredient.ImageUrl : null))
             .ForMember(d => d.Source, o => o.MapFrom(s => s.Source.ToString()));
+
+        // Nutrition
+        CreateMap<DailyNutritionLog, DailyNutritionLogDto>()
+            .ForMember(d => d.MealLogs, o => o.MapFrom(s => s.MealLogs))
+            .ForMember(d => d.TotalCalories, o => o.Ignore())
+            .ForMember(d => d.TotalProtein, o => o.Ignore())
+            .ForMember(d => d.TotalCarbs, o => o.Ignore())
+            .ForMember(d => d.TotalFat, o => o.Ignore());
+
+        CreateMap<MealLog, MealLogDto>()
+            .ForMember(d => d.MealType, o => o.MapFrom(s => s.MealType.ToString()))
+            .ForMember(d => d.RecipeName, o => o.MapFrom(s => s.Recipe != null ? s.Recipe.Title : null))
+            .ForMember(d => d.FoodName, o => o.Ignore());
+
+        // Fitness
+        CreateMap<Exercise, ExerciseDto>()
+            .ForMember(d => d.MuscleGroup, o => o.MapFrom(s => s.MuscleGroup.ToString()));
+
+        CreateMap<WorkoutPlan, WorkoutPlanDto>()
+            .ForMember(d => d.ExerciseCount, o => o.MapFrom(s => s.Exercises.Count));
+
+        CreateMap<WorkoutPlan, WorkoutPlanDetailDto>()
+            .ForMember(d => d.Exercises, o => o.MapFrom(s => s.Exercises));
+
+        CreateMap<WorkoutPlanExercise, WorkoutPlanExerciseDto>()
+            .ForMember(d => d.ExerciseName, o => o.MapFrom(s =>
+                s.Exercise != null ? s.Exercise.Name : string.Empty))
+            .ForMember(d => d.MuscleGroup, o => o.MapFrom(s =>
+                s.Exercise != null ? s.Exercise.MuscleGroup.ToString() : string.Empty));
+
+        CreateMap<Workout, WorkoutDto>()
+            .ForMember(d => d.WorkoutPlanName, o => o.MapFrom(s =>
+                s.WorkoutPlan != null ? s.WorkoutPlan.Name : null))
+            .ForMember(d => d.SetCount, o => o.MapFrom(s => s.Sets.Count));
+
+        CreateMap<Workout, WorkoutDetailDto>()
+            .ForMember(d => d.WorkoutPlanName, o => o.MapFrom(s =>
+                s.WorkoutPlan != null ? s.WorkoutPlan.Name : null))
+            .ForMember(d => d.Sets, o => o.MapFrom(s => s.Sets));
+
+        CreateMap<WorkoutSet, WorkoutSetDto>()
+            .ForMember(d => d.ExerciseName, o => o.MapFrom(s =>
+                s.Exercise != null ? s.Exercise.Name : string.Empty))
+            .ForMember(d => d.MuscleGroup, o => o.MapFrom(s =>
+                s.Exercise != null ? s.Exercise.MuscleGroup.ToString() : string.Empty));
     }
 }

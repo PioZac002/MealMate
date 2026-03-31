@@ -20,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<IRecipeService, RecipeService>();
         services.AddScoped<IFridgeService, FridgeService>();
         services.AddScoped<IShoppingService, ShoppingService>();
+        services.AddScoped<INutritionService, NutritionService>();
+        services.AddScoped<IFitnessService, FitnessService>();
 
         return services;
     }

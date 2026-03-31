@@ -8,7 +8,8 @@ using MealMate.Domain.Enums;
 namespace MealMate.Infrastructure.Data;
 
 public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>,
-    IApplicationDbContext, IIngredientDbContext, IRecipeDbContext, IFridgeDbContext, IShoppingDbContext
+    IApplicationDbContext, IIngredientDbContext, IRecipeDbContext, IFridgeDbContext, IShoppingDbContext,
+    INutritionDbContext, IFitnessDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
