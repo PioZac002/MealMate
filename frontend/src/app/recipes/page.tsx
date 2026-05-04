@@ -13,7 +13,6 @@ export default function RecipesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
     recipesApi.getAll({ search: search || undefined, dietType: dietType || undefined })
       .then(r => {
         if (r.data) setRecipes(r.data);
@@ -54,12 +53,18 @@ export default function RecipesPage() {
             type="text"
             placeholder="Search recipes..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => {
+              setLoading(true);
+              setSearch(e.target.value);
+            }}
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           />
           <select
             value={dietType}
-            onChange={e => setDietType(e.target.value)}
+            onChange={e => {
+              setLoading(true);
+              setDietType(e.target.value);
+            }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="">All diets</option>

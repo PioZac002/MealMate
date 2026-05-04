@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { exercisesApi, workoutsApi, workoutPlansApi, Exercise, Workout, WorkoutDetail } from '@/services/api';
+import { exercisesApi, workoutsApi, Exercise, Workout, WorkoutDetail } from '@/services/api';
 
 const MUSCLE_GROUPS = ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core', 'Cardio', 'FullBody'];
 const MUSCLE_GROUP_COLORS: Record<string, string> = {
@@ -167,12 +168,12 @@ export default function FitnessPage() {
               <span className="text-xl font-bold text-gray-900">MealMate+</span>
             </div>
             <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600">
-              <a href="/dashboard" className="hover:text-green-600">Dashboard</a>
-              <a href="/recipes" className="hover:text-green-600">Recipes</a>
-              <a href="/fridge" className="hover:text-green-600">Fridge</a>
-              <a href="/shopping" className="hover:text-green-600">Shopping</a>
-              <a href="/nutrition" className="hover:text-green-600">Nutrition</a>
-              <a href="/fitness" className="text-green-600 font-semibold">Fitness</a>
+              <Link href="/dashboard" className="hover:text-green-600">Dashboard</Link>
+              <Link href="/recipes" className="hover:text-green-600">Recipes</Link>
+              <Link href="/fridge" className="hover:text-green-600">Fridge</Link>
+              <Link href="/shopping" className="hover:text-green-600">Shopping</Link>
+              <Link href="/nutrition" className="hover:text-green-600">Nutrition</Link>
+              <Link href="/fitness" className="text-green-600 font-semibold">Fitness</Link>
             </div>
           </div>
         </div>

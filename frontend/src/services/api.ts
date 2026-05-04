@@ -151,6 +151,31 @@ export interface RecipeStep {
   imageUrl?: string;
 }
 
+export interface RecipeInputIngredient {
+  ingredientId: string;
+  quantity: number;
+  unit: string;
+}
+
+export interface RecipeInputStep {
+  stepNumber: number;
+  description: string;
+  imageUrl?: string;
+}
+
+export interface RecipeInput {
+  title: string;
+  description?: string;
+  prepTimeMinutes: number;
+  cookTimeMinutes: number;
+  servings: number;
+  dietType: string;
+  imageUrl?: string;
+  isPublic: boolean;
+  ingredients: RecipeInputIngredient[];
+  steps: RecipeInputStep[];
+}
+
 export const recipesApi = {
   getAll: (params?: { search?: string; dietType?: string; page?: number; pageSize?: number }) => {
     const query = new URLSearchParams();
@@ -161,11 +186,8 @@ export const recipesApi = {
     return api.get<PagedResult<Recipe>>(`/recipes?${query}`);
   },
   getById: (id: string) => api.get<RecipeDetail>(`/recipes/${id}`),
-  create: (data: Omit<Recipe, 'id' | 'createdAt' | 'createdByUserId' | 'createdByUserName'> & {
-    ingredients: { ingredientId: string; quantity: number; unit: string }[];
-    steps: { stepNumber: number; description: string; imageUrl?: string }[];
-  }) => api.post<RecipeDetail>('/recipes', data),
-  update: (id: string, data: unknown) => api.put<RecipeDetail>(`/recipes/${id}`, data),
+  create: (data: RecipeInput) => api.post<RecipeDetail>('/recipes', data),
+  update: (id: string, data: RecipeInput) => api.put<RecipeDetail>(`/recipes/${id}`, data),
   delete: (id: string) => api.delete(`/recipes/${id}`),
 };
 

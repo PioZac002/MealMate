@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,6 +35,8 @@ export default function ShoppingPage() {
       householdsApi.getMyHouseholds().then(r => {
         if (r.data && r.data.length > 0) {
           setHouseholds(r.data);
+          setLoading(true);
+          setActiveList(null);
           setSelectedHousehold(r.data[0].id);
         }
       });
@@ -44,18 +46,36 @@ export default function ShoppingPage() {
     }
   }, [isAuthenticated]);
 
-  useEffect(() => {
-    if (selectedHousehold) loadLists();
-  }, [selectedHousehold]);
-
-  const loadLists = async () => {
-    if (!selectedHousehold) return;
+  const loadLists = useCallback(async (householdId: string) => {
     setLoading(true);
     setActiveList(null);
-    const r = await shoppingApi.getAll(selectedHousehold);
+    const r = await shoppingApi.getAll(householdId);
     if (r.data) setLists(r.data);
     setLoading(false);
-  };
+  }, []);
+
+  const refreshActiveList = useCallback(async () => {
+    if (!activeList) return;
+    const r = await shoppingApi.getById(selectedHousehold, activeList.id);
+    const detail = r.data;
+    if (detail) {
+      setActiveList(detail);
+      setLists(prev => prev.map(l => l.id === detail.id
+        ? { ...l, itemCount: detail.items.length, boughtCount: detail.items.filter(i => i.isBought).length }
+        : l
+      ));
+    }
+  }, [activeList, selectedHousehold]);
+
+  useEffect(() => {
+    if (selectedHousehold) {
+      shoppingApi.getAll(selectedHousehold)
+        .then(r => {
+          if (r.data) setLists(r.data);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [selectedHousehold]);
 
   const openList = async (listId: string) => {
     const r = await shoppingApi.getById(selectedHousehold, listId);
@@ -69,7 +89,7 @@ export default function ShoppingPage() {
     if (r.error) { setError(r.error); return; }
     setShowCreateList(false);
     setNewListName('');
-    await loadLists();
+    await loadLists(selectedHousehold);
     if (r.data) setActiveList(r.data);
   };
 
@@ -85,44 +105,35 @@ export default function ShoppingPage() {
     if (r.error) { setError(r.error); return; }
     setShowAddItem(false);
     setItemForm({ ingredientId: '', quantity: '', unit: '' });
-    refreshActiveList();
+    await refreshActiveList();
   };
 
   const handleToggle = async (itemId: string) => {
     if (!activeList) return;
     await shoppingApi.toggleItem(selectedHousehold, activeList.id, itemId);
-    refreshActiveList();
+    await refreshActiveList();
   };
 
   const handleRemoveItem = async (itemId: string) => {
     if (!activeList) return;
     await shoppingApi.removeItem(selectedHousehold, activeList.id, itemId);
-    refreshActiveList();
+    await refreshActiveList();
   };
 
   const handleCompleteList = async () => {
     if (!activeList || !confirm('Mark this list as completed?')) return;
     const r = await shoppingApi.complete(selectedHousehold, activeList.id);
-    if (r.data) { setActiveList(r.data); loadLists(); }
+    if (r.data) {
+      setActiveList(r.data);
+      await loadLists(selectedHousehold);
+    }
   };
 
   const handleDeleteList = async (listId: string) => {
     if (!confirm('Delete this shopping list?')) return;
     await shoppingApi.delete(selectedHousehold, listId);
     if (activeList?.id === listId) setActiveList(null);
-    loadLists();
-  };
-
-  const refreshActiveList = async () => {
-    if (!activeList) return;
-    const r = await shoppingApi.getById(selectedHousehold, activeList.id);
-    if (r.data) {
-      setActiveList(r.data);
-      setLists(prev => prev.map(l => l.id === r.data!.id
-        ? { ...l, itemCount: r.data!.items.length, boughtCount: r.data!.items.filter(i => i.isBought).length }
-        : l
-      ));
-    }
+    await loadLists(selectedHousehold);
   };
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -155,7 +166,11 @@ export default function ShoppingPage() {
             {households.length > 1 && (
               <select
                 value={selectedHousehold}
-                onChange={e => { setSelectedHousehold(e.target.value); setActiveList(null); }}
+                onChange={e => {
+                  setLoading(true);
+                  setActiveList(null);
+                  setSelectedHousehold(e.target.value);
+                }}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               >
                 {households.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}

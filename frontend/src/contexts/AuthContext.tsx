@@ -1,7 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { authApi, User } from '@/services/api';
+import React, { createContext, useContext, useSyncExternalStore } from 'react';
+import { authApi, type User } from '@/services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -14,23 +14,41 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+const authListeners = new Set<() => void>();
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('accessToken');
-    if (storedUser && token) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        localStorage.removeItem('user');
-        localStorage.removeItem('accessToken');
-      }
-    }
-    setIsLoading(false);
-  }, []);
+function emitAuthChange() {
+  authListeners.forEach((listener) => listener());
+}
+
+function subscribeToAuth(listener: () => void) {
+  authListeners.add(listener);
+  return () => authListeners.delete(listener);
+}
+
+function getStoredUser(): User | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const storedUser = localStorage.getItem('user');
+  const token = localStorage.getItem('accessToken');
+
+  if (!storedUser || !token) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedUser) as User;
+  } catch {
+    localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    return null;
+  }
+}
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const user = useSyncExternalStore(subscribeToAuth, getStoredUser, () => null);
 
   const login = async (email: string, password: string): Promise<string | null> => {
     const result = await authApi.login({ email, password });
@@ -39,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('accessToken', result.data.accessToken);
       localStorage.setItem('refreshToken', result.data.refreshToken);
       localStorage.setItem('user', JSON.stringify(result.data.user));
-      setUser(result.data.user);
+      emitAuthChange();
     }
     return null;
   };
@@ -53,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('accessToken', result.data.accessToken);
       localStorage.setItem('refreshToken', result.data.refreshToken);
       localStorage.setItem('user', JSON.stringify(result.data.user));
-      setUser(result.data.user);
+      emitAuthChange();
     }
     return null;
   };
@@ -62,13 +80,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
-    setUser(null);
+    emitAuthChange();
   };
 
   return (
     <AuthContext.Provider value={{
       user,
-      isLoading,
+      isLoading: false,
       isAuthenticated: !!user,
       login,
       register,

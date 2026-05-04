@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,6 +35,7 @@ export default function FridgePage() {
       householdsApi.getMyHouseholds().then(r => {
         if (r.data && r.data.length > 0) {
           setHouseholds(r.data);
+          setLoading(true);
           setSelectedHousehold(r.data[0].id);
         }
       });
@@ -44,17 +45,22 @@ export default function FridgePage() {
     }
   }, [isAuthenticated]);
 
-  useEffect(() => {
-    if (selectedHousehold) loadFridge();
-  }, [selectedHousehold]);
-
-  const loadFridge = async () => {
-    if (!selectedHousehold) return;
+  const loadFridge = useCallback(async (householdId: string) => {
     setLoading(true);
-    const r = await fridgeApi.getAll(selectedHousehold);
+    const r = await fridgeApi.getAll(householdId);
     if (r.data) setFridgeItems(r.data);
     setLoading(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (selectedHousehold) {
+      fridgeApi.getAll(selectedHousehold)
+        .then(r => {
+          if (r.data) setFridgeItems(r.data);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [selectedHousehold]);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +74,7 @@ export default function FridgePage() {
     if (r.error) { setError(r.error); return; }
     setShowAddForm(false);
     setForm({ ingredientId: '', quantity: '', unit: '', expiryDate: '' });
-    loadFridge();
+    await loadFridge(selectedHousehold);
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -82,13 +88,13 @@ export default function FridgePage() {
     });
     if (r.error) { setError(r.error); return; }
     setEditItem(null);
-    loadFridge();
+    await loadFridge(selectedHousehold);
   };
 
   const handleDelete = async (itemId: string) => {
     if (!confirm('Remove this item from the fridge?')) return;
     await fridgeApi.delete(selectedHousehold, itemId);
-    loadFridge();
+    await loadFridge(selectedHousehold);
   };
 
   const openEdit = (item: FridgeItem) => {
@@ -138,7 +144,10 @@ export default function FridgePage() {
             {households.length > 1 && (
               <select
                 value={selectedHousehold}
-                onChange={e => setSelectedHousehold(e.target.value)}
+                onChange={e => {
+                  setLoading(true);
+                  setSelectedHousehold(e.target.value);
+                }}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               >
                 {households.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}

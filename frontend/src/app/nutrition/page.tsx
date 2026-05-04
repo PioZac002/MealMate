@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { nutritionApi, DailyNutritionLog, MealLog } from '@/services/api';
 
@@ -157,12 +158,12 @@ export default function NutritionPage() {
               <span className="text-xl font-bold text-gray-900">MealMate+</span>
             </div>
             <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600">
-              <a href="/dashboard" className="hover:text-green-600">Dashboard</a>
-              <a href="/recipes" className="hover:text-green-600">Recipes</a>
-              <a href="/fridge" className="hover:text-green-600">Fridge</a>
-              <a href="/shopping" className="hover:text-green-600">Shopping</a>
-              <a href="/nutrition" className="text-green-600 font-semibold">Nutrition</a>
-              <a href="/fitness" className="hover:text-green-600">Fitness</a>
+              <Link href="/dashboard" className="hover:text-green-600">Dashboard</Link>
+              <Link href="/recipes" className="hover:text-green-600">Recipes</Link>
+              <Link href="/fridge" className="hover:text-green-600">Fridge</Link>
+              <Link href="/shopping" className="hover:text-green-600">Shopping</Link>
+              <Link href="/nutrition" className="text-green-600 font-semibold">Nutrition</Link>
+              <Link href="/fitness" className="hover:text-green-600">Fitness</Link>
             </div>
           </div>
         </div>

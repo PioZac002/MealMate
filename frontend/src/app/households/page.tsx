@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,19 +23,24 @@ export default function HouseholdsPage() {
     }
   }, [isLoading, isAuthenticated, router]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchHouseholds();
-    }
-  }, [isAuthenticated]);
-
-  const fetchHouseholds = async () => {
+  const fetchHouseholds = useCallback(async () => {
     const r = await householdsApi.getMyHouseholds();
     if (r.data) {
       setHouseholds(r.data as HouseholdDetail[]);
     }
     setLoading(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      householdsApi.getMyHouseholds().then(r => {
+        if (r.data) {
+          setHouseholds(r.data as HouseholdDetail[]);
+        }
+        setLoading(false);
+      });
+    }
+  }, [isAuthenticated]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +50,7 @@ export default function HouseholdsPage() {
     } else {
       setMessage({ text: 'Household created!', type: 'success' });
       setNewName('');
-      fetchHouseholds();
+      await fetchHouseholds();
     }
   };
 
@@ -57,7 +62,7 @@ export default function HouseholdsPage() {
     } else {
       setMessage({ text: 'Joined household!', type: 'success' });
       setJoinCode('');
-      fetchHouseholds();
+      await fetchHouseholds();
     }
   };
 
